@@ -1,5 +1,5 @@
-cd backend
-node main.js
+cd backend <br>
+node main.js <br>
 
-cd frontend
-npm run dev
+cd frontend <br>
+npm run dev <br>
