@@ -21,8 +21,22 @@ const AddButtonContainer = styled.div`
     height: 10%;
     width: 100%;
     display: flex;
-    align-items: flex-end;
-    background-color: blue;
+    align-items: center;
+    justify-content: flex-end;
+    background-color: #f0f0f0;
+`
+
+const AddButton = styled.button`
+    height: 25px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border: none;
+    background-color: #483AA0;
+    border-radius: 10px;
+    cursor:pointer;
+    color: #fff;
+    margin-right: 10px;
 `
 
 const ListContainer = styled.div`
@@ -35,5 +49,6 @@ export const ListagemTarefaStyled = {
     Container,
     Card,
     AddButtonContainer,
-    ListContainer
+    ListContainer,
+    AddButton
 }
