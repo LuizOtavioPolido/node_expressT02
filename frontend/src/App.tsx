@@ -9,6 +9,7 @@ function App() {
       <Routes>
         <Route path='/listagemTarefas' element={<ListagemTarefa />}/>
         <Route path='/tarefa' element={<Tarefa />} />
+        <Route path='/tarefa/:id' element={<Tarefa />} />
       </Routes>
     </BrowserRouter>
   )

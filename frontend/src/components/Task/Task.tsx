@@ -7,11 +7,12 @@ interface TaskProps {
   onClick?: () => void;
 }
 
-export default function Task({ titleTask }: TaskProps) {
+export default function Task({ titleTask, onClick, onRemove }: TaskProps) {
   return (
     <TaskStyled.Container>
-      <TaskStyled.Content>{titleTask}
-        <TaskStyled.RemoveButton><FaRegTrashAlt /></TaskStyled.RemoveButton>
+      <TaskStyled.Content>
+        <div onClick={onClick}>{titleTask}</div>
+        <TaskStyled.RemoveButton onClick={onRemove}><FaRegTrashAlt /></TaskStyled.RemoveButton>
       </TaskStyled.Content>
     </TaskStyled.Container>
   );
