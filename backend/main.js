@@ -1,70 +1,82 @@
 const express = require('express')
 const cors = require('cors')
+const {DatabaseSync} = require('node:sqlite')
 const app = express()
 const port = 3000
 
-let listaTarefas = []
+const database = new DatabaseSync('./database.db')
+
+function createTable(){
+    const query = `
+        CREATE TABLE IF NOT EXISTS tarefa (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            nome TEXT NOT NULL,
+            descricao TEXT NOT NULL,
+            status TEXT NOT NULL
+        )
+    `
+
+    database.exec(query)
+}
 
 app.use(cors())
 app.use(express.json())
 
 app.get('/tarefas', (req, res) => {
-    res.send(listaTarefas)
+    const query = `
+        SELECT * FROM tarefa
+    `
+
+    const stmt = database.prepare(query)
+    const result = stmt.all()
+
+    res.send(result)
 })
 
 app.get('/tarefas/:id', (req, res) => {
     const id = req.params.id
 
-    const index = listaTarefas.findIndex((item) => item.id == id)
+    const query = `
+        SELECT * FROM tarefa WHERE id = ?
+    `   
 
-    if(index != -1){
-        res.status(200).send(listaTarefas[index])
-    } else {
-        res.status(404).send({
-            mensagem: "Item não existe"
-        })
-    }
+    const stmt = database.prepare(query)
+    const result = stmt.get(id)
 
-    
+    res.status(200).send(result)
 })
 
 app.delete('/tarefas/:id', (req, res) => {
     const id = Number(req.params.id)
 
-    const novaListaFiltrada = listaTarefas.filter((item) => item.id != id)
+    const query = `
+        DELETE FROM tarefa WHERE id = ?
+    `
 
-    listaTarefas = novaListaFiltrada
+    const stmt = database.prepare(query)
+    const result = stmt.run(id)
 
     res.status(200).send({
-        mensagem: `Item com id ${id} removido com sucesso!`
+        mensagem: `Item com id ${id} removido com sucesso!`,
+        result
     })
 })
 
 app.put('/tarefas/:id', (req, res) => {
     const id = Number(req.params.id)
-
     const {nome, descricao, status} = req.body 
 
-    const item = {
-        id,
-        nome,
-        descricao,
-        status
-    }
+    const query = `
+        UPDATE tarefa SET nome = ?, descricao = ?, status = ? WHERE id = ?
+    `
 
-    const index = listaTarefas.findIndex((item) => item.id == id)
+    const stmt = database.prepare(query)
+    const result = stmt.run(nome, descricao, status, id)
 
-    if(index != -1){
-        listaTarefas[index] = item
-
-        res.status(200).send({
-            mensagem: "Item atualizado com sucesso!"
-        })
-    } else {
-        res.status(404).send({
-            mensagem: "Item não encontrado"
-        })
-    }
+    res.status(200).send({
+        mensagem: "Item atualizado com sucesso!",
+        result
+    })
 })
 
 app.post('/tarefas', (req, res) => {
@@ -72,20 +84,20 @@ app.post('/tarefas', (req, res) => {
 
     const {nome, descricao, status} = req.body 
 
-    const item = {
-        id: listaTarefas.length + 1,
-        nome,
-        descricao,
-        status
-    }
+    const query = `
+        INSERT INTO tarefa (nome, descricao, status) VALUES (?, ?, ?)
+    `
 
-    listaTarefas.push(item)
+    const stmt = database.prepare(query)
+    const result = stmt.run(nome, descricao, status)
 
     res.status(201).send({
-        mensagem: "Tarefa criada com sucesso!"
+        mensagem: "Tarefa criada com sucesso!",
+        result
     })
 })
 
 app.listen(port, () => {
+    createTable()
     console.log('servidor tá rodando')
 })
